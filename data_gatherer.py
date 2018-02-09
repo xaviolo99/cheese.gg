@@ -8,11 +8,11 @@ import sys
 import json
 import time
 
-print("cheese.gg Recursive Data Gatherer v0.1, by xaviolo99")
+print("cheese.gg Recursive Data Gatherer v1.0, by xaviolo99")
 
 # USER GIVEN DATA #
 
-apiKey = "" #If it doesnt work, create a new one
+apiKey = "RGAPI-0cab4d49-cca0-4118-a82b-47a76f8b6111" #If it doesnt work, create a new one
 beginTime = str( ( int(time.time())-1209600 )*1000 ) #https://www.epochconverter.com/ (1209600 seconds is 14 days)
 delay = 120/(100*0.95) #seconds in 2 mins/(number of requests allowed per 2 minutes * penalty to avoid exceeding rate limit)
 
@@ -78,6 +78,17 @@ def ok(data):
         return False
     except:
         return True
+
+def create_delta(data):
+    delta = [0, 0, 0, 0]
+    try:
+        delta[0] = int(round(data["0-10"], 2)*100)
+        delta[1] = int(round(data["10-20"], 2)*100)
+        delta[2] = int(round(data["20-30"], 2)*100)
+        delta[3] = int(round(data["30-end"], 2)*100)
+    except:
+        pass
+    return delta
     
 #This function extracts matches from a summoner's match history
 def dissect_summoner(sID):
@@ -139,6 +150,8 @@ def dissect_match(mID):
 
     #duration [duration]
     duration = mData["gameDuration"]
+    if duration < 360: #dont store games with remake
+        return
 
     for champion in mData["participants"]:
         stats = champion["stats"]
@@ -191,6 +204,11 @@ def dissect_match(mID):
             
         spell1 = spellId_to_spell.index(spell1)
         spell2 = spellId_to_spell.index(spell2)
+        
+        if spell1 != 4 and spell1 > spell2:
+            cac = spell1
+            spell1 = spell2
+            spell2 = cac
 
         #crowd control [ccStat] [ccTime]
         ccStat = stats["timeCCingOthers"]
@@ -222,27 +240,37 @@ def dissect_match(mID):
         cs = stats["totalMinionsKilled"]
         csJunStolen = stats["neutralMinionsKilledEnemyJungle"]
 
-        #WIP
-##        #deltas [xpDelta] [xpDiffDelta] [csDelta] [csDiffDelta] [goldDelta] [takenDelta] [takenDiffDelta]
-##        deltas = champion["timeline"]
-##        
-##        xpDelta = create_delta(deltas["xpPerMinDeltas"])
-##        xpDiffDelta = create_delta(deltas["xpDiffPerMinDeltas"])
-##        
-##        csDelta = create_delta(deltas["creepsPerMinDeltas"])
-##        csDiffDelta = create_delta(deltas["csDiffPerMinDeltas"])
-##        
-##        takenDelta = create_delta(deltas["damageTakenPerMinDeltas"])
-##        takenDiffDelta = create_delta(deltas["damageTakenDiffPerMinDeltas"])
-##
-##        goldDelta = create_delta(deltas["goldPerMinDeltas"])
+        #deltas [xpDelta] [xpDiffDelta] [csDelta] [csDiffDelta] [goldDelta] [takenDelta] [takenDiffDelta] [0_10, 10_20, 20_30, 30_end] (4) 4*7= 28
+        #WARNING! ALL DELTAS ARE MULTIPLIED BY 100 AND WITHOUT DECIMALS TO USE LESS SPACE#
+        deltas = champion["timeline"]
         
+        xpDelta = create_delta(deltas["xpPerMinDeltas"])
+        csDelta = create_delta(deltas["creepsPerMinDeltas"])
+        takenDelta = create_delta(deltas["damageTakenPerMinDeltas"])
+        
+        goldDelta = create_delta(deltas["goldPerMinDeltas"])
+
+        try:
+            xpDiffDelta = create_delta(deltas["xpDiffPerMinDeltas"])
+            csDiffDelta = create_delta(deltas["csDiffPerMinDeltas"])
+            takenDiffDelta = create_delta(deltas["damageTakenDiffPerMinDeltas"])
+        except:
+            xpDiffDelta = [0, 0, 0, 0]
+            csDiffDelta = [0, 0, 0, 0]
+            takenDiffDelta = [0, 0, 0, 0]
+
         #Save To Database
         try:
-            db.execute("INSERT INTO data (champID, role, side, win, duration, kills, deaths, assists, keyRune, spell1, spell2, ccStat, ccTime, visionScore, wardsPlaced, wardsKilled, healing, damageTaken, mitigated, "+
-                       "totalDealt, totalMagic, champsDealt, champsMagic, turretsDealt, objectiveDealt, cs, csJunStolen) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);",
-                       (champID, role, side, win, duration, kills, deaths, assists, keyRune, spell1, spell2, ccStat, ccTime, visionScore, wardsPlaced, wardsKilled, healing, damageTaken, mitigated,
-                       totalDealt, totalMagic, champsDealt, champsMagic, turretsDealt, objectiveDealt, cs, csJunStolen) )
+            db.execute("INSERT INTO data (champID, role, side, win, duration, kills, deaths, assists, keyRune, spell1, spell2, ccStat, ccTime, visionScore, wardsPlaced, wardsKilled, healing, damageTaken, "+
+                       "mitigated, totalDealt, totalMagic, champsDealt, champsMagic, turretsDealt, objectiveDealt, cs, csJunStolen, xpDelta0_10, xpDelta10_20, xpDelta20_30, xpDelta30_end, xpDiffDelta0_10, "+
+                       "xpDiffDelta10_20, xpDiffDelta20_30, xpDiffDelta30_end, csDelta0_10, csDelta10_20, csDelta20_30, csDelta30_end, csDiffDelta0_10, csDiffDelta10_20, csDiffDelta20_30, csDiffDelta30_end, "+
+                       "goldDelta0_10, goldDelta10_20, goldDelta20_30, goldDelta30_end, takenDelta0_10, takenDelta10_20, takenDelta20_30, takenDelta30_end, takenDiffDelta0_10, takenDiffDelta10_20, "+
+                       "takenDiffDelta20_30, takenDiffDelta30_end) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, "+
+                       "?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);",
+                       (champID, role, side, win, duration, kills, deaths, assists, keyRune, spell1, spell2, ccStat, ccTime, visionScore, wardsPlaced, wardsKilled,healing, damageTaken, mitigated,totalDealt,
+                        totalMagic, champsDealt, champsMagic, turretsDealt, objectiveDealt, cs, csJunStolen, xpDelta[0], xpDelta[1], xpDelta[2], xpDelta[3], xpDiffDelta[0], xpDiffDelta[1], xpDiffDelta[2],
+                        xpDiffDelta[3], csDelta[0], csDelta[1], csDelta[2], csDelta[3], csDiffDelta[0], csDiffDelta[1], csDiffDelta[2], csDiffDelta[3], goldDelta[0],goldDelta[1], goldDelta[2], goldDelta[3],
+                        takenDelta[0], takenDelta[1], takenDelta[2], takenDelta[3], takenDiffDelta[0], takenDiffDelta[1], takenDiffDelta[2], takenDiffDelta[3]) )
             db.commit()
         except UnboundLocalError:
             print("ERROR (game)")
@@ -252,7 +280,7 @@ def dissect_match(mID):
 try:
     f = open('DATA'+server+'.db', 'xt')
     f.close()
-    print("No database found. Creating a new one...\n")
+    print("\nNo database found\nCreating a new one...\n")
 
     db = sqlite3.connect("DATA"+server+".db")
     db.execute("CREATE TABLE IF NOT EXISTS summoners (id INT);")
@@ -262,11 +290,16 @@ try:
 
     db.execute("CREATE TABLE IF NOT EXISTS data (champID UNSIGNED TINYINT, role TINYINT, side BIT, win BIT, duration UNSIGNED SMALLINT, kills SMALLINT, deaths SMALLINT, assists SMALLINT, keyRune TINYINT, "+
                "spell1 TINYINT, spell2 TINYINT, ccStat SMALLINT, ccTime SMALLINT, visionScore SMALLINT, wardsPlaced MEDIUMINT, wardsKilled SMALLINT, healing INT, damageTaken INT, mitigated INT, "+
-               "totalDealt INT, totalMagic INT, champsDealt INT, champsMagic INT, turretsDealt MEDIUMINT, objectiveDealt INT, cs UNSIGNED MEDIUMINT, csJunStolen MEDIUMINT);")#27 elements (+ deltas)
+               "totalDealt INT, totalMagic INT, champsDealt INT, champsMagic INT, turretsDealt MEDIUMINT, objectiveDealt INT, cs UNSIGNED MEDIUMINT, csJunStolen MEDIUMINT, xpDelta0_10 MEDIUMINT, "+
+               "xpDelta10_20 MEDIUMINT, xpDelta20_30 MEDIUMINT, xpDelta30_end MEDIUMINT, xpDiffDelta0_10 MEDIUMINT, xpDiffDelta10_20 MEDIUMINT, xpDiffDelta20_30 MEDIUMINT, xpDiffDelta30_end MEDIUMINT, "+
+               "csDelta0_10 SMALLINT, csDelta10_20 SMALLINT, csDelta20_30 SMALLINT, csDelta30_end SMALLINT, csDiffDelta0_10 SMALLINT, csDiffDelta10_20 SMALLINT, csDiffDelta20_30 SMALLINT, "+
+               "csDiffDelta30_end SMALLINT, goldDelta0_10 MEDIUMINT, goldDelta10_20 MEDIUMINT, goldDelta20_30 MEDIUMINT, goldDelta30_end MEDIUMINT, takenDelta0_10 UNSIGNED MEDIUMINT, "+
+               "takenDelta10_20 UNSIGNED MEDIUMINT, takenDelta20_30 UNSIGNED MEDIUMINT, takenDelta30_end UNSIGNED MEDIUMINT, takenDiffDelta0_10 UNSIGNED MEDIUMINT, takenDiffDelta10_20 UNSIGNED MEDIUMINT, "+
+               "takenDiffDelta20_30 UNSIGNED MEDIUMINT, takenDiffDelta30_end UNSIGNED MEDIUMINT);")#27 elements (+ 28 deltas)
 
     dissect_summoner(iSumm)
 except:
-    print("Database found\n")
+    print("\nDatabase found")
     db = sqlite3.connect("DATA"+server+".db")
 
 mInd = db.execute("SELECT match FROM actual;").fetchone()[0]
