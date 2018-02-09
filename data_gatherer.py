@@ -12,7 +12,7 @@ print("cheese.gg Recursive Data Gatherer v0.1, by xaviolo99")
 
 # USER GIVEN DATA #
 
-apiKey = "RGAPI-4a6c7065-78ea-4015-9215-d063e3cfa529" #If it doesnt work, create a new one
+apiKey = "" #If it doesnt work, create a new one
 beginTime = str( ( int(time.time())-1209600 )*1000 ) #https://www.epochconverter.com/ (in milliseconds)
 delay = 120/(100*0.95) #seconds in 2 mins/(number of requests allowed per 2 minutes * penalty to avoid bans)
 
