@@ -13,8 +13,8 @@ print("cheese.gg Recursive Data Gatherer v0.1, by xaviolo99")
 # USER GIVEN DATA #
 
 apiKey = "" #If it doesnt work, create a new one
-beginTime = str( ( int(time.time())-1209600 )*1000 ) #https://www.epochconverter.com/ (in milliseconds)
-delay = 120/(100*0.95) #seconds in 2 mins/(number of requests allowed per 2 minutes * penalty to avoid bans)
+beginTime = str( ( int(time.time())-1209600 )*1000 ) #https://www.epochconverter.com/ (1209600 seconds is 14 days)
+delay = 120/(100*0.95) #seconds in 2 mins/(number of requests allowed per 2 minutes * penalty to avoid rate limiting)
 
 iSumm = ""#accountId
 while iSumm == "":
