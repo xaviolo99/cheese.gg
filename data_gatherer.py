@@ -150,7 +150,8 @@ def dissect_match(mID):
 
     #duration [duration]
     duration = mData["gameDuration"]
-    if duration < 360: #dont store games with remake
+    if duration < 601: #dont store games with a remake or early open mid
+        print("Match with remake or early open mid")
         return
 
     for champion in mData["participants"]:
