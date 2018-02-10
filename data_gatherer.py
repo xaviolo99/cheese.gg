@@ -8,12 +8,16 @@ import sys
 import json
 import time
 
-print("cheese.gg Recursive Data Gatherer v1.0, by xaviolo99")
+print("cheese.gg Recursive Data Gatherer v1.0.2, by xaviolo99")
 
 # USER GIVEN DATA #
 
 apiKey = "" #If it doesnt work, create a new one
+
 beginTime = str( ( int(time.time())-1209600 )*1000 ) #https://www.epochconverter.com/ (1209600 seconds is 14 days)
+season = str(11) #season 11 in the api is season 8 for the players
+queue = str(420) #420 is ranked queue
+
 delay = 120/(100*0.95) #seconds in 2 mins/(number of requests allowed per 2 minutes * penalty to avoid exceeding rate limit)
 
 iSumm = ""#accountId
@@ -74,7 +78,7 @@ spell_to_alpha = ['Teleport', 'Exhaust', 'Barrier', 'Clarity', 'Flash', 'Ignite'
 #This function checks if there was a server error in the request
 def ok(data):
     try:
-        print("ERROR (server) ["+str(data["status"]["status_code"])+"]\n")
+        print("ERROR (server) ["+str(data["status"]["status_code"])+"]")
         return False
     except:
         return True
@@ -92,7 +96,8 @@ def create_delta(data):
     
 #This function extracts matches from a summoner's match history
 def dissect_summoner(sID):
-    sData = json.loads(requests.get("https://"+server+".api.riotgames.com/lol/match/v3/matchlists/by-account/"+sID+"?beginTime="+beginTime+"&api_key="+apiKey).text)
+    sData = json.loads(requests.get("https://"+server+".api.riotgames.com/lol/match/v3/matchlists/by-account/"+sID+"?beginTime="+beginTime+
+                                    "&queue="+queue+"&season="+season+"&api_key="+apiKey).text)
 
     if not ok(sData):
         return
@@ -102,7 +107,7 @@ def dissect_summoner(sID):
     try:
         for match in sData["matches"]:
             #check if the game is a season 8 soloQ one (maybe add flex)
-            if match["season"] < 8 or match["queue"] != 420:
+            if match["platformId"] != server.upper():#if match["season"] != int(season) or match["queue"] != int(queue) or match["platformId"] != server.upper():
                 continue
             
             #store the match if it doesnt exist
