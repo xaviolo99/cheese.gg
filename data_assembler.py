@@ -1,4 +1,4 @@
-#This program joins the data gathered from all diferents endpoints(regions) into one big file
+#This program joins the data gathered from all diferents regions into one big file
 
 import sqlite3
 import sys
