@@ -12,7 +12,7 @@ print("cheese.gg Recursive Data Gatherer v1.0.2, by xaviolo99")
 
 # USER GIVEN DATA #
 
-apiKey = "" #If it doesnt work, create a new one
+apiKey = "RGAPI-68621c54-f99a-48c4-8a6f-29bdc42c0bec" #If it doesnt work, create a new one
 
 beginTime = str( ( int(time.time())-1209600 )*1000 ) #https://www.epochconverter.com/ (1209600 seconds is 14 days)
 season = str(11) #season 11 in the api is season 8 for the players
@@ -284,7 +284,7 @@ def dissect_match(mID):
 # CREATE/RECOVER DATABASE #
 
 try:
-    f = open('DATA'+server+'.db', 'xt')
+    f = open("DATA"+server+".db", "xt")
     f.close()
     print("\nNo database found\nCreating a new one...\n")
 
