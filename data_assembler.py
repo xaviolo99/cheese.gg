@@ -40,4 +40,4 @@ for server in ["RU", "KR", "BR1", "OC1", "JP1", "NA1", "EUN1", "EUW1", "TR1", "L
         pass
 db.close()
 
-print("\nDone!")
+print("\nDone")
