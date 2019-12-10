@@ -1,0 +1,40 @@
+Activations:
+ReLu gives the best performance as long as i can keep the neurons alive.
+
+Batch size:
+64 is just fine
+
+Learning Rate:
+5 is too much, 0.01 is too little
+I would go for 0.5, it has shown the most consistent results so far
+
+Momentum:
+0.9 gives good results, will stay with that
+
+Hidden Units:
+500 seems to give good results.
+
+________________________________________________________________
+
+Ordered in mobile phone
+
+150 hu, 30 sep give worse performance 
+400 hu, 50 sep give better performance but not by much
+
+500 hu, 60 sep (70, 10, 15 embs) give better performance but not a big deal
+
+Note: Using the full dataset seems to produce worse results
+
+600 hu1, 400 hu2, 70 sep (75, 15, 20 embs), Adam
+Gives amazing results when trained for 7 full epochs
+
+________________________________________________________________
+DEFINITIVE:
+
+600 hu1, 400 hu2, 70 sep (75, 15, 20 embs), AMSGrad
+ANOTHER DIMENSION PERFORMANCE, 12 EPOCHS * 56800 batches of size 64 (1780KB)
+________________________________________________________________
+
+ALL WAS OVERFITTING
+
+Best model seems 30 sep, 200 hu, default embeddings, ADAGrad

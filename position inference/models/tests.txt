@@ -1,0 +1,160 @@
+////////////////////////////////////////////////
+BIASED NETS
+
+NET 1:
+
+AMSGrad, 7 EPOCHS
+Embeddings (0.05 dropout):
+60 ID
+10 RUNE
+10 SPELLS
+Local (0.15 dropout):
+70 UNITS
+Global (0(0.1) dropout):
+250 UNITS
+
+loss: 0.03297
+5 correct: 92.26%
+4 correct: 2.23%
+3 correct: 5.14%
+2 correct: 0.34%
+1 correct: 0.02%
+0 correct: 0.0%
+
+The performance is good, but cant improve more than this.
+
+NET 2:
+
+AMSGrad, 7 EPOCHS
+Embeddings (0.05 dropout):
+60 ID
+10 RUNE
+10 SPELLS
+Local (0.2 dropout):
+80 UNITS
+Global (0(0.15) dropout):
+350 UNITS
+
+loss: 0.03339
+5 correct: 92.16%
+4 correct: 2.14%
+3 correct: 5.32%
+2 correct: 0.35%
+1 correct: 0.02%
+0 correct: 0.0%
+
+////////////////////////////////////////////////////
+
+NET 1:
+
+AMSGrad, 7, 14, 21, 28 EPOCHS
+Embeddings (0 dropout):
+60 ID
+10 RUNE
+10 SPELLS
+Local (0 dropout):
+80 UNITS
+Global (0 dropout):
+350 UNITS
+
+7
+loss: 0.03546
+5 correct: 91.75%
+4 correct: 2.41%
+3 correct: 5.41%
+2 correct: 0.39%
+1 correct: 0.03%
+0 correct: 0.0%
+
+14
+loss: 0.03502
+5 correct: 92.0%
+4 correct: 2.1%
+3 correct: 5.47%
+2 correct: 0.4%
+1 correct: 0.02%
+0 correct: 0.0%
+
+21
+loss: 0.03467
+5 correct: 92.11%
+4 correct: 1.99%
+3 correct: 5.49%
+2 correct: 0.38%
+1 correct: 0.03%
+0 correct: 0.0%
+
+28
+loss: 0.03453
+5 correct: 92.24%
+4 correct: 1.93%
+3 correct: 5.38%
+2 correct: 0.41%
+1 correct: 0.04%
+0 correct: 0.0%
+
+I seem to not be overfitting with this parameters (train and validation loss are similar)
+So maybe adding more parameters would help. This is thanks to that we have a lot of data (15MB) which makes overfitting really difficult.
+No dropout needed yet, but if augmenting the neurons we start seeing clear signs of overfitting, we can start to add.
+
+NET 2:
+
+AMSGrad, 7, 14, 35 EPOCHS
+Embeddings (0 dropout):
+65 ID
+12 RUNE
+12 SPELLS
+Local (0 dropout):
+90 UNITS
+Global (0 dropout):
+400 UNITS
+
+7
+loss: 0.03556
+5 correct: 91.61%
+4 correct: 2.65%
+3 correct: 5.32%
+2 correct: 0.4%
+1 correct: 0.02%
+0 correct: 0.0%
+
+14
+loss: 0.03469
+5 correct: 91.93%
+4 correct: 2.28%
+3 correct: 5.37%
+2 correct: 0.39%
+1 correct: 0.03%
+0 correct: 0.0%
+
+35
+loss: 0.03406
+5 correct: 92.28%
+4 correct: 2.02%
+3 correct: 5.29%
+2 correct: 0.38%
+1 correct: 0.03%
+0 correct: 0.0%
+
+NET 3:
+
+AMSGrad, 35 EPOCHS
+Embeddings (0 dropout):
+250 ID
+50 RUNE
+70 SPELLS
+Local (0 dropout):
+360 UNITS
+Global (0 dropout):
+1800 UNITS
+
+loss: 0.03315
+5 correct: 92.45%
+4 correct: 1.87%
+3 correct: 5.24%
+2 correct: 0.4%
+1 correct: 0.03%
+0 correct: 0.0%
+
+MASSIVE NET:
+

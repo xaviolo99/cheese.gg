@@ -1,0 +1,10 @@
+Main database clarifications:
+
+Allies (columns with an A) are always the blue side (team 100).
+Enemies (columns with a E) are always the red side (team 200).
+
+The win column is 1 if the allies or blue side won and 0 otherwise.
+
+The first 5 champions are allies and the last or following 5 enemies.
+
+All deltas are multiplied by 100 to save space.
